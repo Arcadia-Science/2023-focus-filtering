@@ -45,7 +45,7 @@ This protocol is a step by step computational guide to assess different feature-
 
 2. Run Fiji macro to enable users to select frames of a 180-frame video that are in or out of focus. **Output** = csv file with a random six-digit ID in the name with focus assessment for each frame.  [Link to Fiji macro](./code/fiji_macro/user_assessment.ijm) [Link to assessments](./analysis/user_assessments/focus_results_****.csv)
 
-3. Calculate focus measures and associated images. **Input** = experiment images. **Output** = csv file with measures and individual frames calculated with edge-detection algorithms.
+3. Calculate focus measures and associated images. **Input** = experiment images. **Output** = csv file with measures and individual frames calculated with edge-detection algorithms. [Link to python script](./code/python/measures_and_images.py)
 
     python3 code/python/measures_and_images.py
 
