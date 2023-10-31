@@ -1,7 +1,11 @@
 .PHONY: lint
 lint:
 	flake8 . --count --statistics --exit-zero
-	black --check src
+	black --check .
+
+format:
+	black .
+	isort .
 
 .PHONY: pre-commit
 pre-commit:

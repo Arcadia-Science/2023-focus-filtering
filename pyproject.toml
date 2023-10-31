@@ -15,7 +15,6 @@ dynamic = []
 dependencies = []
 
 [tool.black]
-src = ["focus_filtering"]
 line-length = 95
 target-version = ['py310']
 include = '\.pyi?$'
