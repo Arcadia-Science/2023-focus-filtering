@@ -10,10 +10,6 @@ authors = [
   { name = "Keith Cheveralls", email = "keith.cheveralls@arcadiascience.com" },
 ]
 
-dynamic = []
-
-dependencies = []
-
 [tool.black]
 line-length = 95
 target-version = ['py310']
