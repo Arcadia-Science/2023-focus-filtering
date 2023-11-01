@@ -39,13 +39,13 @@ conda activate focus-filtering
 ```
 
 ## Protocol to identify frames of cells in focus using different feature- and edge-detection algorithms
-This protocol is a step by step computational guide to assess different feature- and edge-detection algorithms for identying frames of cells in focus in video micrographs. The input is video data of algal cells collected by brightfield or differential interference contrast microscopy. The output includes computed images and focus measures. For related experimental results [see here](TODO: add link to pub).
+This protocol is a step by step computational guide to assess different feature- and edge-detection algorithms for identifying images in which objects (usually cells) of interest are in focus. The input is video data of algal cells collected by brightfield or differential interference contrast (DIC) microscopy. The output includes computed images and focus measures. For related experimental results [see here](TODO: add link to pub).
 
 1. Open the [sample image data](./experiment_images/sampled_sequence.tif) in Fiji.
 
 2. Run the [Fiji macro](./code/fiji_macro/user_assessment.ijm) to enable users to select frames of a 180-frame video that are in or out of focus. This outputs a CSV file with a random six-digit ID in the name with focus assessment for each frame. The assessments used for the published analysis are [here](./analysis/user_assessments/).
 
-3. Calculate focus measures and associated images using [this script](./code/python/measures_and_images.py). **Input** = experiment images. **Output** = csv file with measures and individual frames calculated with edge-detection algorithms.
+3. Calculate the focus-detection metrics using [this script](./code/python/measures_and_images.py). The input to the script is a TIFF stack of raw brightfield or DIC images. The output is 1) a CSV file with the values of the focus metrics for each frame and 2) the individual frames after filtering with each edge-detection filter.
 
 
 ## Versions and platforms
