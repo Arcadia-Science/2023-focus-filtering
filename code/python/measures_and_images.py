@@ -18,6 +18,14 @@ import numpy as np
 
 from skimage import io
 
+ALL_FOCUS_METHODS = [
+    'variance_of_laplacian',
+    'std_dev_of_intensity_without_blur',
+    'std_dev_of_intensity_with_blur',
+    'sobel_method',
+]
+
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -113,7 +121,7 @@ def process_single_tif_stack(stack_path):
     stack_id = "sampled_sequence"
 
     focus_measures = []
-    for method in focus_methods:
+    for method in ALL_FOCUS_METHODS:
         computed_images_focus_values = [
             compute_focus_measure(frame, method) for frame in original_stack
         ]
@@ -134,13 +142,6 @@ def process_single_tif_stack(stack_path):
 
 
 if __name__ == "__main__":
-    focus_methods = [
-        'variance_of_laplacian',
-        'std_dev_of_intensity_without_blur',
-        'std_dev_of_intensity_with_blur',
-        'sobel_method',
-    ]
-
     focus_measures = process_single_tif_stack("experiment_images/sampled_sequence.tif")
 
     output_csv_dir = './analysis/measurements/'
@@ -150,7 +151,6 @@ if __name__ == "__main__":
         fieldnames = ['stack_id', 'method', 'frame', 'focus_measure']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
-        for row in focus_measures:
-            writer.writerow(row)
+        writer.writerows(focus_measures)
 
     logging.info("Processing complete.")
