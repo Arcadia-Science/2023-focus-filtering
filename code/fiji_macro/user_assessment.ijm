@@ -19,18 +19,18 @@ print(f, "Frame,InFocus");
 for (i = 1; i <= nSlices; i++) {
     // Show the ith slice
     setSlice(i);
-    
+
     // Draw the frame number on the top-left corner of the image
     setColor(255, 255, 255); // White color
     setFont("Arial", 16, "Bold");
     drawString("" + i, 10, 20); // Draw number at position (10,20)
-    
+
     // Update display
     updateDisplay();
-    
+
     // Ask the user if the slice is in focus
     result = getBoolean("Is this slice(" + i + ") in focus?");
-    
+
     // Record the result in the CSV file
     print(f, i + "," + result);
 }
