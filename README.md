@@ -56,6 +56,9 @@ __Python__: the conda environment file is `envs/focus-filtering.yml`. Direct dep
 __Hardware__:
 Computation was performed on a MacBook Pro computer on Ventura 13.4.1 with an M2 Max processor and 32G of memory.
 
+## Development
+This repo uses black and isort for formatting and flake8 for linting. These can be installed using `pip install -r requirements-dev.txt`. There are pre-commit hooks to run these tools prior to each commit; install them using `pre-commit install`. Alternatively, you can run the formatting and linting manually using `make format` and `make lint`.
+
 ## Feedback, contributions, and reuse
 We try to be as open as possible with our work and make all of our code both available and usable.
 We love receiving feedback at any level, through comments on our pubs or Twitter and issues or pull requests here on GitHub.
