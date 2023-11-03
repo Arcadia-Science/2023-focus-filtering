@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 def calc_roc(sorted_labels):
     '''
     calculate the ROC curve for an ordered set of binary labels
-    sorted_labels : list of the binary ground-truth labels sorted by the value of the metric
+    sorted_labels : list of the binary ground-truth labels, sorted by the value of the metric
     '''
     num_positive = sorted_labels.sum()
     num_negative = (~sorted_labels).sum()
@@ -56,16 +56,17 @@ def load_annotations_and_calc_metrics(filepath):
     return annotations
 
 
-def split_annotations(annotations):
+def split_annotations_by_modality(annotations):
     '''
-    split the annotations dataframe into two dataframes,
+    split an annotations dataframe into two dataframes,
     one for the brightfield images and one for the DIC images in the original stack
 
-    WARNING: this is specific to the stack included in this repo
-    (`experiment_images/sampled_sequence.tif`)
+    WARNING: this is specific to the stack and annotations included in this repo
+    (`experiment_images/sampled_sequence.tif` and `analysis/user_assessments/` respectively)
     '''
-    # the frame index at which the frames switch from brightfield ('bf') to DIC
-    bf_dic_ind = 89
+    # the frame index at which frames switch from brightfield ('bf') to DIC
+    # in the stack 'experiment_images/sampled_sequence.tif'
+    bf_dic_ind = 90
 
     annotations_bf = annotations.iloc[:bf_dic_ind].copy().reset_index()
     annotations_dic = annotations.iloc[bf_dic_ind:].copy().reset_index()
@@ -73,19 +74,21 @@ def split_annotations(annotations):
     return annotations_bf, annotations_dic
 
 
-def plot_roc_curves(annotations, method, ax=None, show_axis_labels=True):
+def plot_roc_curves(annotations, metric_name, ax=None, show_axis_labels=True):
     '''
-    plot ROC curves for brightfield and DIC images
-    for a given focus metric and set of annotations
+    Plot ROC curves for a given focus metric and set of annotations
+    for both the brightfield and DIC images (separately)
     '''
     if ax is None:
         plt.figure()
         ax = plt.gca()
 
-    annotations_bf, annotations_dic = split_annotations(annotations)
+    annotations_bf, annotations_dic = split_annotations_by_modality(annotations)
 
     for _label, _annotations in zip(('Brightfield', 'DIC'), (annotations_bf, annotations_dic)):
-        roc_curve = calc_roc(_annotations.sort_values(by=method, ascending=True).InFocus)
+        roc_curve = calc_roc(
+            sorted_labels=_annotations.sort_values(by=metric_name, ascending=True).InFocus
+        )
         ax.plot(roc_curve[0, :], roc_curve[1, :], label=_label)
 
         if show_axis_labels:
@@ -105,7 +108,7 @@ def plot_all_roc_curves():
     annotation_filepaths = list((repo_dirpath / 'analysis' / 'user_assessments').glob('*.csv'))
 
     # instantiate the subplots
-    num_rows = len(calculate_metrics.ALL_FOCUS_METHODS)
+    num_rows = len(calculate_metrics.ALL_FOCUS_METRICS)
     num_cols = len(annotation_filepaths)
     fig, axs = plt.subplots(num_rows, num_cols, figsize=(12, 12))
 
@@ -130,3 +133,8 @@ def plot_all_roc_curves():
 
             if col_ind > 0:
                 ax.set_yticks([])
+
+
+if __name__ == '__main__':
+    plot_all_roc_curves()
+    plt.show()
