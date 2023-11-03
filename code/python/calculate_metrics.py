@@ -1,13 +1,15 @@
 """
 Summary:
-The script is designed to process a single TIF image stack,
-compute various focus metrics,
-and then save the computed images and metrics to specific directories.
-The focus metrics available
-include variance of Laplacian, standard deviation of intensity
-(with and without Gaussian blur), and the Sobel method.
+The script processes a single TIFF image stack, computes various focus metrics,
+and then saves the computed images and metrics to specific directories.
+
+The focus metrics it computes are:
+- variance of the raw intensities (with and without blur)
+- variance of the Laplacian-filtered image
+- variance of the Sobel-filtered image
+
 The script also logs each step of the process.
-Results are saved both as images and as a CSV file containing focus measurements.
+Results are saved both as images and as a CSV file containing the focus metrics.
 """
 
 import csv
@@ -18,8 +20,8 @@ import skimage
 
 ALL_FOCUS_METRICS = [
     'variance_of_laplacian',
-    'std_dev_of_intensity_without_blur',
-    'std_dev_of_intensity_with_blur',
+    'variance_of_intensity_without_blur',
+    'variance_of_intensity_with_blur',
     'sobel_magnitude',
 ]
 
@@ -74,7 +76,7 @@ def sobel_magnitude(image):
     return image_sobel_magnitude, image_sobel_magnitude.var()
 
 
-def std_dev_of_intensity(image, blur=False):
+def variance_of_intensity(image, blur=False):
     '''
     the standard deviation of intensity as a focus metric
     (with or without Gaussian blur)
@@ -90,10 +92,10 @@ def compute_focus_metric(frame, metric_name):
     '''
     if metric_name == 'variance_of_laplacian':
         return variance_of_laplacian(frame)
-    elif metric_name == 'std_dev_of_intensity_without_blur':
-        return std_dev_of_intensity(frame, blur=False)
-    elif metric_name == 'std_dev_of_intensity_with_blur':
-        return std_dev_of_intensity(frame, blur=True)
+    elif metric_name == 'variance_of_intensity_without_blur':
+        return variance_of_intensity(frame, blur=False)
+    elif metric_name == 'variance_of_intensity_with_blur':
+        return variance_of_intensity(frame, blur=True)
     elif metric_name == 'sobel_magnitude':
         return sobel_magnitude(frame)
     else:
