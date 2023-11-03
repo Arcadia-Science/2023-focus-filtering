@@ -13,16 +13,14 @@ Results are saved both as images and as a CSV file containing focus measurements
 import csv
 import logging
 import os
-import cv2
 import numpy as np
-
-from skimage import io
+import skimage
 
 ALL_FOCUS_METHODS = [
     'variance_of_laplacian',
     'std_dev_of_intensity_without_blur',
     'std_dev_of_intensity_with_blur',
-    'sobel_method',
+    'sobel_magnitude',
 ]
 
 
@@ -33,50 +31,57 @@ logging.basicConfig(
 )
 
 
-def variance_of_laplacian(frame):
+def _normalize_image(image):
+    '''
+    Normalize an image to (0, 1)
+    '''
+    image = skimage.img_as_float(image)
+    image -= image.min()
+    image[image < 0] = 0
+    image /= image.max()
+    return image
+
+
+def variance_of_laplacian(image):
     '''
     The variance-of-Laplacian focus measure method
     '''
-    img = cv2.GaussianBlur(frame, (3, 3), 0)
+    image = skimage.img_as_float(image)
 
-    # Compute the Laplacian of the blurred image
-    laplacian = cv2.Laplacian(img, cv2.CV_64F)
+    image_blurred = skimage.filters.gaussian(image, sigma=1)
+    image_laplacian = skimage.filters.laplace(image_blurred, ksize=3)
+    image_laplacian = _normalize_image(image_laplacian)
 
-    # Normalize the Laplacian image
-    laplacian_normalized = cv2.normalize(
-        laplacian, None, 0, 65535, cv2.NORM_MINMAX, cv2.CV_16U
-    )
-    return laplacian_normalized, laplacian.var()
+    return image_laplacian, image_laplacian.var()
 
 
-def sobel_method(frame):
+def sobel_magnitude(image):
     '''
-    the varianc-of-sobel focus measure method
+    The variance-of-sobel focus measure method
     '''
-    img = cv2.GaussianBlur(frame, (3, 3), 0)
+    image = skimage.img_as_float(image)
+
+    image_blurred = skimage.filters.gaussian(image, sigma=1)
 
     # Compute the x-gradient and y-gradient using Sobel operator
-    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)
-    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)
+    image_sobel_h = skimage.filters.sobel_h(image_blurred)
+    image_sobel_v = skimage.filters.sobel_v(image_blurred)
 
-    # Compute the magnitude of the gradient
-    magnitude = np.sqrt(sobelx**2 + sobely**2)
+    # Compute the normalized magnitude of the gradient
+    image_sobel_magnitude = np.sqrt(image_sobel_h**2 + image_sobel_v**2)
+    image_sobel_magnitude = _normalize_image(image_sobel_magnitude)
 
-    # Normalize the magnitude image
-    magnitude_normalized = cv2.normalize(
-        magnitude, None, 0, 65535, cv2.NORM_MINMAX, cv2.CV_16U
-    )
-    return magnitude_normalized, magnitude.var()
+    return image_sobel_magnitude, image_sobel_magnitude.var()
 
 
-def std_dev_of_intensity(frame, blur=False):
+def std_dev_of_intensity(image, blur=False):
     '''
     the standard deviation of intensity as a focus measure method
     (with or without Gaussian blur)
     '''
     if blur:
-        frame = cv2.GaussianBlur(frame, (3, 3), 0)
-    return None, np.std(frame)
+        image = skimage.filters.gaussian(image, sigma=1)
+    return image, image.var()
 
 
 def compute_focus_measure(frame, method):
@@ -89,8 +94,8 @@ def compute_focus_measure(frame, method):
         return std_dev_of_intensity(frame, blur=False)
     elif method == 'std_dev_of_intensity_with_blur':
         return std_dev_of_intensity(frame, blur=True)
-    elif method == 'sobel_method':
-        return sobel_method(frame)
+    elif method == 'sobel_magnitude':
+        return sobel_magnitude(frame)
     else:
         raise ValueError(f"Unknown focus measure method: {method}")
 
@@ -105,7 +110,7 @@ def save_computed_image(image, method, stack_id, frame_num):
     output_path = os.path.join(output_dir, f"{stack_id}_{frame_num}.tif")
 
     if image is not None:
-        io.imsave(output_path, image.astype(np.uint16))
+        skimage.io.imsave(output_path, image.astype(np.uint16))
 
 
 def process_single_tif_stack(stack_path):
@@ -114,7 +119,7 @@ def process_single_tif_stack(stack_path):
     '''
     logging.info(f"Processing TIF stack: {stack_path}")
 
-    original_stack = io.imread(stack_path)
+    original_stack = skimage.io.imread(stack_path)
     logging.info(f"Read TIF stack with {len(original_stack)} frames.")
 
     # Placeholder names (can be adjusted as needed)
