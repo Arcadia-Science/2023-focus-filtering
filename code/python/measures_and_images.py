@@ -1,9 +1,9 @@
 """
 Summary:
 The script is designed to process a single TIF image stack,
-compute its focus measure using various methods,
-and then save the computed images and measurements to specific directories.
-The focus measure methods available
+compute various focus metrics,
+and then save the computed images and metrics to specific directories.
+The focus metrics available
 include variance of Laplacian, standard deviation of intensity
 (with and without Gaussian blur), and the Sobel method.
 The script also logs each step of the process.
@@ -16,7 +16,7 @@ import os
 import numpy as np
 import skimage
 
-ALL_FOCUS_METHODS = [
+ALL_FOCUS_METRICS = [
     'variance_of_laplacian',
     'std_dev_of_intensity_without_blur',
     'std_dev_of_intensity_with_blur',
@@ -44,7 +44,7 @@ def _normalize_image(image):
 
 def variance_of_laplacian(image):
     '''
-    The variance-of-Laplacian focus measure method
+    The variance-of-Laplacian focus metric
     '''
     image = skimage.img_as_float(image)
 
@@ -57,7 +57,7 @@ def variance_of_laplacian(image):
 
 def sobel_magnitude(image):
     '''
-    The variance-of-sobel focus measure method
+    The variance-of-sobel focus metric
     '''
     image = skimage.img_as_float(image)
 
@@ -76,7 +76,7 @@ def sobel_magnitude(image):
 
 def std_dev_of_intensity(image, blur=False):
     '''
-    the standard deviation of intensity as a focus measure method
+    the standard deviation of intensity as a focus metric
     (with or without Gaussian blur)
     '''
     if blur:
@@ -84,27 +84,27 @@ def std_dev_of_intensity(image, blur=False):
     return image, image.var()
 
 
-def compute_focus_measure(frame, method):
+def compute_focus_metric(frame, metric_name):
     '''
-    compute the focus measure for the specified method
+    compute the specified focus metric
     '''
-    if method == 'variance_of_laplacian':
+    if metric_name == 'variance_of_laplacian':
         return variance_of_laplacian(frame)
-    elif method == 'std_dev_of_intensity_without_blur':
+    elif metric_name == 'std_dev_of_intensity_without_blur':
         return std_dev_of_intensity(frame, blur=False)
-    elif method == 'std_dev_of_intensity_with_blur':
+    elif metric_name == 'std_dev_of_intensity_with_blur':
         return std_dev_of_intensity(frame, blur=True)
-    elif method == 'sobel_magnitude':
+    elif metric_name == 'sobel_magnitude':
         return sobel_magnitude(frame)
     else:
-        raise ValueError(f"Unknown focus measure method: {method}")
+        raise ValueError(f"Unknown focus metric: {metric_name}")
 
 
-def save_computed_image(image, method, stack_id, frame_num):
+def save_computed_image(image, metric_name, stack_id, frame_num):
     '''
     write the computed image to an output directory
     '''
-    output_dir = f"./analysis/processed_images/{method}/{stack_id}"
+    output_dir = f"./analysis/processed_images/{metric_name}/{stack_id}"
     os.makedirs(output_dir, exist_ok=True)
 
     output_path = os.path.join(output_dir, f"{stack_id}_{frame_num}.tif")
@@ -115,7 +115,7 @@ def save_computed_image(image, method, stack_id, frame_num):
 
 def process_single_tif_stack(stack_path):
     '''
-    Calculate all of the focus measures for each frame of the stack
+    Calculate all of the focus metric for each frame of the stack
     '''
     logging.info(f"Processing TIF stack: {stack_path}")
 
@@ -125,37 +125,37 @@ def process_single_tif_stack(stack_path):
     # Placeholder names (can be adjusted as needed)
     stack_id = "sampled_sequence"
 
-    focus_measures = []
-    for method in ALL_FOCUS_METHODS:
+    focus_metrics = []
+    for metric_name in ALL_FOCUS_METRICS:
         computed_images_focus_values = [
-            compute_focus_measure(frame, method) for frame in original_stack
+            compute_focus_metric(frame, metric_name) for frame in original_stack
         ]
 
         for frame_num, (image, focus_value) in enumerate(computed_images_focus_values):
-            logging.info(f"Processing frame {frame_num} for {stack_id} using {method}")
-            save_computed_image(image, method, stack_id, frame_num)
-            focus_measures.append(
+            logging.info(f"Processing frame {frame_num} for {stack_id} using {metric_name}")
+            save_computed_image(image, metric_name, stack_id, frame_num)
+            focus_metrics.append(
                 {
                     'stack_id': stack_id,
-                    'method': method,
-                    'frame': frame_num,
-                    'focus_measure': focus_value,
+                    'frame_num': frame_num,
+                    'metric_name': metric_name,
+                    'metric_value': focus_value,
                 }
             )
 
-    return focus_measures
+    return focus_metrics
 
 
 if __name__ == "__main__":
-    focus_measures = process_single_tif_stack("experiment_images/sampled_sequence.tif")
+    focus_metrics = process_single_tif_stack("experiment_images/sampled_sequence.tif")
 
     output_csv_dir = './analysis/measurements/'
     os.makedirs(output_csv_dir, exist_ok=True)
 
     with open('./analysis/measurements/focus_measures.csv', 'w', newline='') as csvfile:
-        fieldnames = ['stack_id', 'method', 'frame', 'focus_measure']
+        fieldnames = ['stack_id', 'frame_num', 'metric_name', 'metric_value']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(focus_measures)
+        writer.writerows(focus_metrics)
 
     logging.info("Processing complete.")
