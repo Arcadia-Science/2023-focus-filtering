@@ -78,7 +78,7 @@ def sobel_magnitude(image):
 
 def variance_of_intensity(image, blur=False):
     '''
-    the standard deviation of intensity as a focus metric
+    the variance of intensity as a focus metric
     (with or without Gaussian blur)
     '''
     if blur:
