@@ -39,7 +39,7 @@ conda activate focus-filtering
 ```
 
 ## Protocol to identify frames of cells in focus using different feature- and edge-detection algorithms
-This protocol is a step by step computational guide to assess different feature- and edge-detection algorithms for identifying images in which objects (usually cells) of interest are in focus. The input is video data of algal cells collected by brightfield or differential interference contrast (DIC) microscopy. The output includes computed images and focus measures. For related experimental results [see here](TODO: add link to pub).
+This protocol is a step by step computational guide to assess different feature- and edge-detection algorithms for identifying images in which objects (usually cells) of interest are in focus. The input is video data of algal cells collected by brightfield or differential interference contrast (DIC) microscopy. The output includes computed images and focus metrics. For related experimental results [see here](TODO: add link to pub).
 
 1. Open the [sample image data](./experiment_images/sampled_sequence.tif) in Fiji.
 
