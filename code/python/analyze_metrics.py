@@ -59,13 +59,13 @@ def load_annotations_and_calc_metrics(filepath):
 def split_annotations_by_modality(annotations):
     '''
     split an annotations dataframe into two dataframes,
-    one for the brightfield images and one for the DIC images in the original stack
+    one for the brightfield ('bf') images and one for the DIC images in the original stack
 
     WARNING: this is specific to the stack and annotations included in this repo
     (`experiment_images/sampled_sequence.tif` and `analysis/user_assessments/` respectively)
     '''
-    # the frame index at which frames switch from brightfield ('bf') to DIC
-    # in the stack 'experiment_images/sampled_sequence.tif'
+    # this is the frame index in the stack 'experiment_images/sampled_sequence.tif'
+    # at which the frames switch from brightfield ('bf') to DIC
     bf_dic_ind = 90
 
     annotations_bf = annotations.iloc[:bf_dic_ind].copy().reset_index()
@@ -74,65 +74,47 @@ def split_annotations_by_modality(annotations):
     return annotations_bf, annotations_dic
 
 
-def plot_roc_curves(annotations, metric_name, ax=None, show_axis_labels=True):
-    '''
-    Plot ROC curves for a given focus metric and set of annotations
-    for both the brightfield and DIC images (separately)
-    '''
-    if ax is None:
-        plt.figure()
-        ax = plt.gca()
-
-    annotations_bf, annotations_dic = split_annotations_by_modality(annotations)
-
-    for _label, _annotations in zip(('Brightfield', 'DIC'), (annotations_bf, annotations_dic)):
-        roc_curve = calc_roc(
-            sorted_labels=_annotations.sort_values(by=metric_name, ascending=True).InFocus
-        )
-        ax.plot(roc_curve[0, :], roc_curve[1, :], label=_label)
-
-        if show_axis_labels:
-            ax.set_xlabel('False positive rate')
-            ax.set_ylabel('True positive rate')
-        ax.set_aspect(1)
-
-    plt.legend()
-
-
 def plot_all_roc_curves():
     '''
     Plot a grid of ROC curves for all focus metrics and all annotations
+
+    The grid has two rows, one for each imaging modality (brightfield and DIC),
+    and one column for each focus metric
     '''
 
     repo_dirpath = utils.find_repo_root(__file__)
     annotation_filepaths = list((repo_dirpath / 'analysis' / 'user_assessments').glob('*.csv'))
 
-    # instantiate the subplots
-    num_rows = len(calculate_metrics.ALL_FOCUS_METRICS)
-    num_cols = len(annotation_filepaths)
-    fig, axs = plt.subplots(num_rows, num_cols, figsize=(12, 12))
+    num_rows = len(('brightfield', 'dic'))
+    num_cols = len(calculate_metrics.ALL_FOCUS_METRICS)
+    _, axs = plt.subplots(num_rows, num_cols, figsize=(10, 5))
 
-    for col_ind, filepath in enumerate(annotation_filepaths):
-        annotations = load_annotations_and_calc_metrics(filepath)
-        for row_ind, metric_name in enumerate(calculate_metrics.ALL_FOCUS_METRICS):
-            ax = axs[row_ind][col_ind]
-            plot_roc_curves(
-                annotations, metric_name=metric_name, ax=ax, show_axis_labels=False
-            )
-            ax.set_title(
-                '%s - %s'
-                % (
-                    filepath.stem.replace('focus_results_', ''),
-                    metric_name.replace('_of_intensity', ''),
-                ),
-                fontsize=10,
-            )
+    for filepath in annotation_filepaths:
+        annotations_all = load_annotations_and_calc_metrics(filepath)
+        annotations_bf, annotations_dic = split_annotations_by_modality(annotations_all)
 
-            if row_ind < num_rows - 1:
-                ax.set_xticks([])
+        for col_ind, metric_name in enumerate(calculate_metrics.ALL_FOCUS_METRICS):
+            for row_ind, annotations in enumerate((annotations_bf, annotations_dic)):
+                ax = axs[row_ind][col_ind]
 
-            if col_ind > 0:
-                ax.set_yticks([])
+                sorted_labels = annotations.sort_values(by=metric_name, ascending=True).InFocus
+
+                roc_curve = calc_roc(sorted_labels)
+                ax.plot(roc_curve[0, :], roc_curve[1, :], color='#28b', alpha=0.5)
+
+                if row_ind == 0:
+                    ax.set_title(metric_name.replace('_', ' ').capitalize(), fontsize=10)
+
+                if row_ind == num_rows - 1:
+                    ax.set_xlabel('False positive rate')
+
+                if col_ind == 0:
+                    ax.set_ylabel('True positive rate')
+
+                if col_ind > 0:
+                    ax.set_yticks([])
+
+                ax.set_aspect(1)
 
 
 if __name__ == '__main__':
