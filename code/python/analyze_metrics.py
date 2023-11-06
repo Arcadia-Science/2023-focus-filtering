@@ -1,3 +1,4 @@
+import os
 import calculate_metrics
 import numpy as np
 import pandas as pd
@@ -119,4 +120,6 @@ def plot_all_roc_curves():
 
 if __name__ == '__main__':
     plot_all_roc_curves()
-    plt.show()
+    plot_dirpath = utils.find_repo_root(__file__) / 'output'
+    os.makedirs(plot_dirpath, exist_ok=True)
+    plt.savefig(plot_dirpath / 'roc_curves.svg', format='svg')
