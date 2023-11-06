@@ -4,7 +4,7 @@ The script processes a single TIFF image stack, computes various focus metrics,
 and then saves the computed images and metrics to specific directories.
 
 The focus metrics it computes are:
-- variance of the raw intensities (with and without blur)
+- variance of the raw intensities
 - variance of the Laplacian-filtered image
 - variance of the Sobel-filtered image
 
@@ -19,10 +19,9 @@ import numpy as np
 import skimage
 
 ALL_FOCUS_METRICS = [
-    'variance_of_laplacian',
     'variance_of_intensity_without_blur',
-    'variance_of_intensity_with_blur',
-    'sobel_magnitude',
+    'variance_of_sobel_magnitude',
+    'variance_of_laplacian',
 ]
 
 
@@ -57,7 +56,7 @@ def variance_of_laplacian(image):
     return image_laplacian, image_laplacian.var()
 
 
-def sobel_magnitude(image):
+def variance_of_sobel_magnitude(image):
     '''
     The variance-of-sobel focus metric
     '''
@@ -94,10 +93,8 @@ def compute_focus_metric(frame, metric_name):
         return variance_of_laplacian(frame)
     elif metric_name == 'variance_of_intensity_without_blur':
         return variance_of_intensity(frame, blur=False)
-    elif metric_name == 'variance_of_intensity_with_blur':
-        return variance_of_intensity(frame, blur=True)
-    elif metric_name == 'sobel_magnitude':
-        return sobel_magnitude(frame)
+    elif metric_name == 'variance_of_sobel_magnitude':
+        return variance_of_sobel_magnitude(frame)
     else:
         raise ValueError(f"Unknown focus metric: {metric_name}")
 
