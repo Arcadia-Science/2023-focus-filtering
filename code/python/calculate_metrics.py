@@ -15,8 +15,10 @@ Results are saved both as images and as a CSV file containing the focus metrics.
 import csv
 import logging
 import os
+import pathlib
 import numpy as np
 import skimage
+import utils
 
 ALL_FOCUS_METRICS = [
     'variance_of_intensity_without_blur',
@@ -103,11 +105,13 @@ def save_computed_image(image, metric_name, stack_id, frame_num):
     '''
     write the computed image to an output directory
     '''
-    output_dir = f"./analysis/processed_images/{metric_name}/{stack_id}"
+    repo_dirpath = utils.find_repo_root(__file__)
+    output_dir = pathlib.Path(
+        repo_dirpath / 'analysis' / 'processed_images' / metric_name / stack_id
+    )
     os.makedirs(output_dir, exist_ok=True)
 
-    output_path = os.path.join(output_dir, f"{stack_id}_{frame_num}.tif")
-
+    output_path = output_dir / f"{stack_id}_{frame_num}.tif"
     if image is not None:
         skimage.io.imsave(output_path, image.astype(np.uint16))
 
@@ -146,12 +150,15 @@ def process_single_tif_stack(stack_path):
 
 
 if __name__ == "__main__":
-    focus_metrics = process_single_tif_stack("experiment_images/sampled_sequence.tif")
+    repo_dirpath = utils.find_repo_root(__file__)
+    focus_metrics = process_single_tif_stack(
+        pathlib.Path(repo_dirpath / "experiment_images" / "sampled_sequence.tif")
+    )
 
-    output_csv_dir = './analysis/measurements/'
+    output_csv_dir = repo_dirpath / 'analysis' / 'measurements'
     os.makedirs(output_csv_dir, exist_ok=True)
 
-    with open('./analysis/measurements/focus_measures.csv', 'w', newline='') as csvfile:
+    with open(output_csv_dir / 'focus_measures.csv', 'w', newline='') as csvfile:
         fieldnames = ['stack_id', 'frame_num', 'metric_name', 'metric_value']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
