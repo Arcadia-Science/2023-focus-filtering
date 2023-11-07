@@ -126,6 +126,6 @@ def plot_all_roc_curves():
 
 if __name__ == '__main__':
     plot_all_roc_curves()
-    plot_dirpath = utils.find_repo_root(__file__) / 'output'
+    plot_dirpath = utils.find_repo_root(__file__) / 'analysis' / 'figures'
     os.makedirs(plot_dirpath, exist_ok=True)
     plt.savefig(plot_dirpath / 'focus_metric_roc_curves.svg', format='svg')
