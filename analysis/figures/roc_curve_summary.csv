@@ -1,0 +1,7 @@
+modality,metric,fpr,tpr
+Brightfield,variance_of_intensity_without_blur,0.048,0.000
+Brightfield,variance_of_laplacian,0.048,0.567
+Brightfield,variance_of_sobel_magnitude,0.048,0.710
+DIC,variance_of_intensity_without_blur,0.052,0.000
+DIC,variance_of_laplacian,0.052,0.717
+DIC,variance_of_sobel_magnitude,0.052,0.786
