@@ -45,19 +45,21 @@ This protocol is a step by step computational guide to assess different feature-
 
 2. Run the [Fiji macro](./code/fiji_macro/user_assessment.ijm) to enable users to select frames of a 180-frame video that are in or out of focus. This outputs a CSV file with a random six-digit ID in the name with focus assessment for each frame. The assessments used for the published analysis are [here](./analysis/user_assessments/).
 
-3. Calculate the focus-detection metrics using [this script](./code/python/measures_and_images.py). The input to the script is a TIFF stack of raw brightfield or DIC images. The output is 1) a CSV file with the values of the focus metrics for each frame and 2) the individual frames after filtering with each edge-detection filter.
+3. Calculate the focus-detection metrics using `python code/python/measures_and_images.py`. This script loads the TIFF stack of raw brightfield or DIC images included with this repo (`experiment_images/sampled_sequence.tif`). The script outputs a CSV file with the values of the focus metrics for each frame and the individual frames after filtering with each edge-detection filter in `analysis/measurements/` and `analysis/processed_images/`, respectively.
 
+## Reproducing the analysis from the pub
+To reproduce the ROC curves for each focus metric using the manual annotations included in this repo, run the analysis script using `python code/python/analyze_metrics.py`. This script outputs the ROC curves and a CSV file containing the median TPRs at a 5% FPR in the `analysis/figures/` directory of this repo.
 
 ## Versions and platforms
 __Fiji macro__: the macro was used with ImageJ2 Version 2.14.0/1.54f.
 
-__Python__: the conda environment file is `envs/focus-filtering.yml`. Direct dependencies are found in `requirements.txt`.
+__Python__: the conda environment file is `envs/focus-filtering.yml`.
 
 __Hardware__:
 Computation was performed on a MacBook Pro computer on Ventura 13.4.1 with an M2 Max processor and 32G of memory.
 
 ## Development
-This repo uses black and isort for formatting and flake8 for linting. These can be installed using `pip install -r requirements-dev.txt`. There are pre-commit hooks to run these tools prior to each commit; install them using `pre-commit install`. Alternatively, you can run the formatting and linting manually using `make format` and `make lint`.
+This repo uses `black` and `isort` for formatting and `flake8` for linting. These can be installed using `pip install -r requirements-dev.txt`. There are pre-commit hooks to run these tools prior to each commit; install them using `pre-commit install`. Alternatively, you can run the formatting and linting manually using `make format` and `make lint`.
 
 ## Feedback, contributions, and reuse
 We try to be as open as possible with our work and make all of our code both available and usable.
