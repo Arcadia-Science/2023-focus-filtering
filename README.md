@@ -1,19 +1,10 @@
-# Assessment of feature- and edge-detection algorithms for identifying frames of cells in focus
-This repository contains code for image processing and analysis to identify frames from video micrographs with *Chlamydomonas* cells in the focal plane. See [Comparison of feature- and edge-detection algorithms for identifying cells in focus](TODO: add link) for more details.
-
-
-## Release snapshots
-__Github__<br>
-[![DOI](TODO: add badge link)](TODO: add zenodo link)
-
-__Data__<br>
-[![DOI](TODO: add badge link)](TODO: add zenodo link)
-
+# Streamlining microscopy data sets by enriching for in-focus frames
+This repository contains code for image processing and analysis to identify frames from video micrographs with *Chlamydomonas* cells in the focal plane. This repo accompanies the pub [Streamlining microscopy data sets by enriching for in-focus frames](https://doi.org/10.57844/arcadia-d86f-498c). Please refer to the pub for more details.
 
 ## Computational Protocols
 For each step run the commands indicated in code blocks from the "focus-filtering" directory. This repository uses conda to manage software environments and installations.
 
-You can find operating system-specific instructions for installing miniconda [here](https://docs.conda.io/en/latest/miniconda.html). We installed Miniconda3 version `23.7.3':
+You can find operating system-specific instructions for installing miniconda [here](https://docs.conda.io/en/latest/miniconda.html). We installed Miniconda3 version `23.7.3`:
 ```sh
 # download the miniconda installation script
 curl -JLO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
